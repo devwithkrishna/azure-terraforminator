@@ -34,7 +34,21 @@ AZURE_CLIENT_SECRET = "value"
 AZURE_TENANT_ID = "value"
 ```
 
-
 * The code is using python with poetry as package management tool
 
 * This job is set to run as a cron every day and as a manual trigger as well if necessary
+
+```markdown
+
+This is a sample of output showing what are the resources deleted
+
+The below resources are decommisioned on <Date : yyyy-mm-dd>
++------------------------+-----------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+
+| Name                   | Type                              | ID                                                                                                                                                 | Resource Group Name   |
++========================+===================================+====================================================================================================================================================+=======================+
+| Name of resource   | Type | Resource Id   | Rg name          |
++------------------------+-----------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+
+| mystorageaccountswswwe | Microsoft.Storage/storageAccounts | /subscriptions/es271149ae-05d3-4dcsssf-b946-d71f3f39/resourceGroups/ARCHITECTS-3/providers/Microsoft.Storage/storageAccounts/mystorageaccountswswwe | ARCHITECTS-3          |
++------------------------+-----------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+
+
+```
