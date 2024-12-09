@@ -23,13 +23,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: set up python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: package installations
         run: |
           pip install poetry
-          poetry install
+          poetry install -v
       - name: run python program
         run: |
           poetry run python3 terraforminator.py --subscription_name ${{ env.subscription_name }}
