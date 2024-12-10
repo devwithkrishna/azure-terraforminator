@@ -1,8 +1,8 @@
 import os
+from tabulate import tabulate
 from datetime import datetime, date
 import argparse
 import asyncio
-from tabulate import tabulate
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.resource.resources.v2022_09_01 import ResourceManagementClient
@@ -17,20 +17,24 @@ async def list_resource_groups_with_temporary_tag(subscription_id: str):
 	# load_dotenv()
 	credential = DefaultAzureCredential()
 	resource_management_client = ResourceManagementClient(subscription_id=subscription_id, credential=credential)
-	tag_filter= f"tagName eq 'Temporary' and tagValue eq 'TRUE'"
+	tag_filter= f"tagName eq 'Temporary'"
 	all_rgs_filtered = resource_management_client.resource_groups.list(filter=tag_filter)
 	rgs_to_deleted = []
-	for rg in all_rgs_filtered:
+	# Programmatically filter resource groups for tagValue in a case-insensitive manner
+	case_insensitive_rgs = [
+		rg for rg in all_rgs_filtered
+		if rg.tags and 'Temporary' in rg.tags and rg.tags['Temporary'].lower() == 'true'
+	]
+	for rg in case_insensitive_rgs:
 		rg_dict = {
 			'name': rg.name,
 			'location': rg.location
 		}
 		rgs_to_deleted.append(rg_dict) # final dictionary of rgs to be deleted with Temporary tag value as TRUE
 
-	# print(rgs_to_deleted)
+	print(rgs_to_deleted)
+
 	return rgs_to_deleted
-
-
 async def delete_resource_groups(subscription_id: str, rgs_to_be_deleted: list[dict]):
 	"""
 	Delete the resource groups with Temporary tag value as TRUE
@@ -41,7 +45,7 @@ async def delete_resource_groups(subscription_id: str, rgs_to_be_deleted: list[d
 
 	for rg in rgs_to_be_deleted:
 		try:
-			print(f"Deleting {rg['name']} from {subscription_id} subscription")
+			print(f"Deleting {rg['name']} from {subscription_id}")
 			resource_management_client.resource_groups.begin_delete(resource_group_name=rg['name']).result()
 			print(f"Successfully deleted {rg['name']}")
 
@@ -54,7 +58,6 @@ async def delete_resource_groups(subscription_id: str, rgs_to_be_deleted: list[d
 			print(f"Failed to delete resource group '{rg['name']}': {e}")
 		# Optional: Add a short delay between deletions to prevent overwhelming the service
 		await asyncio.sleep(1)
-
 
 def list_resources_in_rg(subscription_id:str, rgs_to_be_deleted: list[dict]):
 	"""
@@ -84,7 +87,6 @@ def list_resources_in_rg(subscription_id:str, rgs_to_be_deleted: list[dict]):
 
 	return details_to_display
 
-
 async def main():
 	"""To test the code"""
 	start_time = datetime.utcnow()  # Get start time in UTC
@@ -103,7 +105,8 @@ async def main():
 	print(f"The below resources are decommisioned on {date.today()}")
 	# Extracting headers and rows
 	headers = ["Name", "Type", "ID", "Resource Group Name"]
-	rows = [[item["name"], item["resource_type"], item["resource_id"], item["resource_group"]] for item in details_to_dispaly]
+	rows = [[item["name"], item["resource_type"], item["resource_id"], item["resource_group"]] for item in
+			details_to_dispaly]
 	# Printing in tabular format
 	print(tabulate(rows, headers=headers, tablefmt="grid"))
 	end_time = datetime.utcnow()  # Get end time in UTC
