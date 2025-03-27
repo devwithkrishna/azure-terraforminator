@@ -12,6 +12,9 @@ inputs:
     default: ""
     description: "The azure subscription name."
 runs:
+  defaults:
+    run:
+      shell: bash
   using: 'composite'
   steps:
     - name: Install Python
