@@ -3,28 +3,27 @@ description: 'A GitHub Action that decommisions resource groups tagged with Temp
 author: 'githubofkrishnadhas'
 # reference https://haya14busa.github.io/github-action-brandings/
 branding:
-    icon: 'cloud-lightning'
-    color: 'green'
+  icon: 'cloud-lightning'
+  color: 'green'
 inputs:
   subscription_name:
     required: true
-    type: string
     default: ""
     description: "The azure subscription name."
 runs:
-  defaults:
-    run:
-      shell: bash
   using: 'composite'
   steps:
-    - name: Install Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    - name: package installations
-      run: |
-        pip install poetry
-        poetry install -v --no-root --no-interaction
-    - name: Run Python program
-      run: |
-        poetry run python3 terraforminator.py --subscription_name ${{ inputs.subscription_name }}
+  - name: Install Python
+    uses: actions/setup-python@v5
+    with:
+      python-version: '3.11'
+
+  - name: package installations
+    shell: bash
+    run: |
+      pip install poetry
+      poetry install -v --no-root --no-interaction
+  - name: Run Python program
+    shell: bash
+    run: |
+      poetry run python3 terraforminator.py --subscription_name ${{ inputs.subscription_name }}
