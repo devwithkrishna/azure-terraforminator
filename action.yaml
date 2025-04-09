@@ -16,6 +16,8 @@ runs:
 
   - name: Checkout
     uses: actions/checkout@v4
+    with:
+      repository: 'devwithkrishna/azure-terraforminator'
 
   - name: list files
     shell: bash
